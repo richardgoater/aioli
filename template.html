@@ -77,9 +77,9 @@
         <!-- Plotly -->
         <script src="https://cdn.plot.ly/plotly-1.30.0.min.js" integrity="sha384-9I+xvBv+nGk5/ckJh9ZsFmoCRtC7j2KI7hpwfnnObbiWXiTrctb3A2IuweOYt2fw" crossorigin="anonymous"></script>
         <!-- Aioli -->
-        <script src="node_modules/@robertaboukhalil/aioli/aioli.js"></script>
+        <script src="aioli.js"></script>
         <script>
-        DIR_IMPORTS = [ "app.js" ];
+        DIR_IMPORTS = [ "./mash.js" ];
 
         // =============================================================================
         // Main class
@@ -164,45 +164,57 @@
             // -------------------------------------------------------------------------
             process()
             {
-                // Find next chunk to sample.
-                // Note: isValidFastqChunk() is defined in aioli.user.js
-                var getNextChunk = this.aioli.sample(this.file, "isValidFastqChunk");
-                var nextSampling = {};
-                return getNextChunk.then(d =>
-                {
-                    nextSampling = d;
-
-                    // Check if need to stop sampling
-                    if(nextSampling.done || this.paused)
-                    {
-                        if(nextSampling.done) {
-                            this.done = true;
-                            this.paused = true;
-                        }
-                        // One last update
-                        this.viz();
-                        return;
-                    }
-
-                    // Run main() with command-line argument "comp" followed by the File of interest
-                    // Note that this file must have been previously mounted using Aioli.mount()
-                    return this.aioli.exec({
-                        chunk: nextSampling,
-                        args: ["comp", this.file],
-                    });
-                }).then(d => {
-                    if(d == null)
-                        return;
-
-                    // TODO: Parse and save output
-                    this.output += d.data.length;
-
-                    // Visualize and keep processing
+                console.log('Processing ...')
+                return this.aioli.exec({
+                    args: ["size", "-k", "32", "-m", "3", "-r", `/data/${this.file.name}`],
+                })
+                .then(d => {
+                    console.log(d);
+                    
+                    this.done = true;
+                    this.paused = true;
+                    // One last update
                     this.viz();
-                    this.process();
-                }).catch(e => {
-                    console.error(`Error: ${e}. Skipping...`);
                 });
+                // // Find next chunk to sample.
+                // // Note: isValidFastqChunk() is defined in aioli.user.js
+                // var getNextChunk = this.aioli.sample(this.file, "isValidFastqChunk");
+                // var nextSampling = {};
+                // return getNextChunk.then(d =>
+                // {
+                //     nextSampling = d;
+
+                //     // Check if need to stop sampling
+                //     if(nextSampling.done || this.paused)
+                //     {
+                //         if(nextSampling.done) {
+                //             this.done = true;
+                //             this.paused = true;
+                //         }
+                //         // One last update
+                //         this.viz();
+                //         return;
+                //     }
+
+                //     // Run main() with command-line argument "comp" followed by the File of interest
+                //     // Note that this file must have been previously mounted using Aioli.mount()
+                //     return this.aioli.exec({
+                //         chunk: nextSampling,
+                //         args: ["comp", this.file],
+                //     });
+                // }).then(d => {
+                //     if(d == null)
+                //         return;
+
+                //     // TODO: Parse and save output
+                //     this.output += d.data.length;
+
+                //     // Visualize and keep processing
+                //     this.viz();
+                //     this.process();
+                // }).catch(e => {
+                //     console.error(`Error: ${e}. Skipping...`);
+                // });
             }
 
             // -------------------------------------------------------------------------

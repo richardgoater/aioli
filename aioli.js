@@ -10,9 +10,9 @@ if(!(window.Worker && window.File && window.FileReader && window.WebAssembly))
     throw "Your browser is not supported";
 
 DEBUG = false;
-DIR_WASM = "../../../wasm";
-DIR_WORKER = "node_modules/@robertaboukhalil/aioli/aioli.worker.js";
-DIR_PAPAPARSE = "../../papaparse/papaparse.min.js";
+DIR_WASM = ".";
+DIR_WORKER = "./aioli.worker.js";
+DIR_PAPAPARSE = "./node_modules/papaparse/papaparse.js";
 
 class Aioli
 {
